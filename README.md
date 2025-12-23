@@ -32,7 +32,6 @@ This method works on:
 
 ## 🛠 How to Change Video Screen Size (Ubuntu)
 
----
  
 ## 1️⃣  Navigate to the `.cast` file location
 
@@ -41,12 +40,15 @@ Examples:
 ```bash
 cd ~
 
+
 ## 2️⃣  Open the .cast file using nano
 
 ```bash
 nano demo.cast
 
 Replace demo.cast with your actual file name.
+
+
 
 ## 3️⃣ Locate the first line of the file
 
@@ -56,6 +58,7 @@ You will see something like:
 
 
 This line defines the video (terminal) screen size.
+
 
 ##4️⃣  Edit the width and height
 
@@ -67,6 +70,8 @@ Change the values to your desired size. Example:
 width controls how wide the terminal appears
 
 height controls how tall the terminal appears
+
+
 
 ## 5️⃣  Save and exit nano
 
