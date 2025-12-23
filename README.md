@@ -39,9 +39,3 @@ Examples:
 
 ```bash
 cd ~
-
-ctrl + alt + T
-
-
-
-## 2️⃣  Open the .cast file using nano
