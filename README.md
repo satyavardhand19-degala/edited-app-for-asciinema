@@ -33,7 +33,7 @@ This method works on:
 ## 🛠 How to Change Video Screen Size (Ubuntu)
 
  
-## 1️⃣  Navigate to the `.cast` file location
+### 1️⃣  Navigate to the `.cast` file location
 
 Examples:
 
@@ -41,4 +41,22 @@ Examples:
 cd ~
 ```
 
-## 2 
+ 
+### 2️⃣  Open the .cast file using nano
+
+```json
+nano demo.cast
+```
+
+Replace demo.cast with your actual file name.
+
+---
+### 3️⃣ Locate the first line of the file
+
+You will see something like:
+
+```json
+{"version": 2, "width": 120, "height": 30}
+```
+
+This line defines the video (terminal) screen size
