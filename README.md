@@ -40,43 +40,8 @@ Examples:
 ```bash
 cd ~
 
+ctrl + alt + T
+
+
 
 ## 2️⃣  Open the .cast file using nano
-
-```bash
-nano demo.cast
-
-Replace demo.cast with your actual file name.
-
-
-
-## 3️⃣ Locate the first line of the file
-
-You will see something like:
-```bash
-{"version": 2, "width": 120, "height": 30}
-
-
-This line defines the video (terminal) screen size.
-
-
-##4️⃣  Edit the width and height
-
-Change the values to your desired size. Example:
-```bash
-{"version": 2, "width": 80, "height": 24}
-
-
-width controls how wide the terminal appears
-
-height controls how tall the terminal appears
-
-
-
-## 5️⃣  Save and exit nano
-
-Press Ctrl + O
-
-Press Enter to confirm
-
-Press Ctrl + X to exit
