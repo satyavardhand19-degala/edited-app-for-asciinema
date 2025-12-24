@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Asciinema Test</title>
+
+  <!-- Asciinema Player v3 -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/asciinema-player@3/dist/bundle/asciinema-player.css">
+  <script
+        src="https://cdn.jsdelivr.net/npm/asciinema-player@3/dist/bundle/asciinema-player.min.js">
+  </script>
+</head>
+<body>
+
+<div id="player"></div>
+
+<script>
+  AsciinemaPlayer.create(
+    'new.cast',
+    document.getElementById('player'),
+    {
+      autoplay: true,
+      loop: true,
+      speed: 1.0
+    }
+  );
+</script>
+
+</body>
+</html>
