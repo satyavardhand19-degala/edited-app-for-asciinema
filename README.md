@@ -51,6 +51,7 @@ nano demo.cast
 Replace demo.cast with your actual file name.
 
 ---
+
 ### 3️⃣ Locate the first line of the file
 
 You will see something like:
@@ -60,6 +61,7 @@ You will see something like:
 ```
 
 This line defines the video (terminal) screen size
+
 ---
 
 ### 4️⃣  Edit width and height
@@ -73,6 +75,7 @@ Change the values as needed:
 width → terminal columns
 
 height → terminal rows
+
 ---
 
 ### 5️⃣  Save and exit
@@ -82,4 +85,5 @@ Press Ctrl + O
 Press Enter
 
 Press Ctrl + X
+
 ---
