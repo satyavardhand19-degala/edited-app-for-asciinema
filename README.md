@@ -60,3 +60,22 @@ You will see something like:
 ```
 
 This line defines the video (terminal) screen size
+
+### 4️⃣  Edit width and height
+
+Change the values as needed:
+
+```json
+{"version": 2, "width": 80, "height": 24}
+```
+width → terminal columns
+
+height → terminal rows
+
+### 5️⃣  Save and exit
+
+Press Ctrl + O
+
+Press Enter
+
+Press Ctrl + X
