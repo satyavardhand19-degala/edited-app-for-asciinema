@@ -8,8 +8,10 @@ const playhead = document.getElementById("playhead");
 
 const startHandle = document.querySelector(".handle.start");
 const endHandle   = document.querySelector(".handle.end");
+
 const addCutBtn   = document.getElementById("addCutBtn");
 const applyCutBtn = document.getElementById("applyCutBtn");
+const exportBtn   = document.getElementById("exportBtn");
 
 let castData = null;
 let duration = 0;
@@ -17,8 +19,7 @@ let player = null;
 
 let draggingHandle = null;
 let scrubbing = false;
-
-let cuts = []; // {start, end}
+let cuts = []; // { start, end }
 
 /* ================= LOAD CAST ================= */
 
@@ -51,7 +52,7 @@ function loadPlayer() {
   playerBox.innerHTML = "";
 
   let text = JSON.stringify({
-    version: castData.version,
+    version: 2,
     width: castData.width,
     height: castData.height,
     idle_time_limit: null
@@ -137,7 +138,7 @@ document.addEventListener("mousemove", e => {
   }
 });
 
-/* ================= CUTS ================= */
+/* ================= MULTI CUT ================= */
 
 addCutBtn.onclick = () => {
   const w = timeline.clientWidth;
@@ -176,10 +177,7 @@ applyCutBtn.onclick = () => {
   for (const e of castData.stdout) {
     let t = e[0];
 
-    while (
-      cutIndex < cuts.length &&
-      t > cuts[cutIndex].end
-    ) {
+    while (cutIndex < cuts.length && t > cuts[cutIndex].end) {
       removedTime += cuts[cutIndex].end - cuts[cutIndex].start;
       cutIndex++;
     }
@@ -188,9 +186,7 @@ applyCutBtn.onclick = () => {
       cutIndex < cuts.length &&
       t >= cuts[cutIndex].start &&
       t <= cuts[cutIndex].end
-    ) {
-      continue;
-    }
+    ) continue;
 
     newStdout.push([
       t - removedTime,
@@ -207,6 +203,32 @@ applyCutBtn.onclick = () => {
   drawTimeline();
   resetHandles();
   drawCuts();
+};
+
+/* ================= EXPORT ================= */
+
+exportBtn.onclick = () => {
+  if (!castData || !castData.stdout.length) return;
+
+  const header = {
+    version: 2,
+    width: castData.width,
+    height: castData.height,
+    idle_time_limit: null
+  };
+
+  let text = JSON.stringify(header) + "\n";
+  castData.stdout.forEach(e => text += JSON.stringify(e) + "\n");
+
+  const blob = new Blob([text], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "edited.cast";
+  a.click();
+
+  URL.revokeObjectURL(url);
 };
 
 /* ================= PLAYHEAD ================= */
