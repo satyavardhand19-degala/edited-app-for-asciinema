@@ -4,16 +4,19 @@ const fileInput = document.getElementById("fileInput");
 const playerBox = document.getElementById("player");
 const timeline = document.getElementById("timeline");
 const ruler = document.getElementById("timelineRuler");
+const playhead = document.getElementById("playhead");
 
 let castData = null;
 let duration = 0;
+let draggingPlayhead = false;
+
+/* ---------- LOAD CAST ---------- */
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-
   reader.onload = () => {
     try {
       const lines = reader.result
@@ -35,30 +38,31 @@ fileInput.addEventListener("change", () => {
       duration = stdout.at(-1)[0];
 
       loadPlayer();
-
       requestAnimationFrame(drawTimeline);
 
-    } catch (err) {
+    } catch (e) {
       alert("Invalid .cast file");
-      console.error(err);
+      console.error(e);
     }
   };
-
   reader.readAsText(file);
 });
+
+/* ---------- PLAYER ---------- */
 
 function loadPlayer() {
   playerBox.innerHTML = "";
 
-  const header = {
+  let text = JSON.stringify({
     version: castData.version,
     width: castData.width,
     height: castData.height,
     idle_time_limit: null
-  };
+  }) + "\n";
 
-  let text = JSON.stringify(header) + "\n";
-  for (const e of castData.stdout) text += JSON.stringify(e) + "\n";
+  for (const e of castData.stdout) {
+    text += JSON.stringify(e) + "\n";
+  }
 
   const blob = new Blob([text], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -67,9 +71,13 @@ function loadPlayer() {
     autoplay: false,
     controls: true
   });
+
+  playerBox.addEventListener("asciinema:time", e => {
+    updatePlayhead(e.detail.time);
+  });
 }
 
-/* -------- TIMELINE VISUAL ONLY -------- */
+/* ---------- TIMELINE ---------- */
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
@@ -82,27 +90,50 @@ function drawTimeline() {
   if (!duration) return;
 
   const width = timeline.clientWidth;
-  if (width === 0) return;
+  if (!width) return;
 
-  // spacing ~80px
   const pixelsPerSecond = width / duration;
   let step = Math.ceil(80 / pixelsPerSecond);
-
-  if (step <= 1) step = 1;
-  else if (step <= 2) step = 2;
-  else if (step <= 5) step = 5;
-  else if (step <= 10) step = 10;
-  else if (step <= 30) step = 30;
-  else step = 60;
+  if (step < 1) step = 1;
+  if (step > 60) step = 60;
 
   for (let t = 0; t <= duration; t += step) {
     const x = (t / duration) * width;
-
     const tick = document.createElement("div");
     tick.className = "timeline-tick";
     tick.style.left = `${x}px`;
     tick.textContent = formatTime(t);
-
     ruler.appendChild(tick);
   }
 }
+
+function updatePlayhead(time) {
+  if (!duration) return;
+  const x = (time / duration) * timeline.clientWidth;
+  playhead.style.left = `${x}px`;
+}
+
+/* ---------- DRAG PLAYHEAD ---------- */
+
+playhead.addEventListener("mousedown", e => {
+  draggingPlayhead = true;
+  e.stopPropagation();
+});
+
+document.addEventListener("mouseup", () => {
+  draggingPlayhead = false;
+});
+
+document.addEventListener("mousemove", e => {
+  if (!draggingPlayhead || !duration) return;
+
+  const rect = timeline.getBoundingClientRect();
+  let x = e.clientX - rect.left;
+  x = Math.max(0, Math.min(rect.width, x));
+
+  playhead.style.left = `${x}px`;
+
+  const time = (x / rect.width) * duration;
+  const player = playerBox.querySelector("asciinema-player");
+  if (player?.seek) player.seek(time);
+});

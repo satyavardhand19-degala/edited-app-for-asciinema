@@ -26,3 +26,14 @@
   background: #2a2f38;
   border-radius: 4px;
 }
+
+/* PLAYHEAD */
+
+#playhead {
+  position: absolute;
+  top: -22px;
+  width: 2px;
+  height: 42px;
+  background: red;
+  cursor: ew-resize;
+}
