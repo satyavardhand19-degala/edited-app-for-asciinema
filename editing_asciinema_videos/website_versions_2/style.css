@@ -1,0 +1,28 @@
+/* TIMELINE */
+
+.timeline-panel {
+  margin-top: 20px;
+}
+
+.timeline-ruler {
+  position: relative;
+  height: 22px;
+  background: #1b1f26;
+  color: #ccc;
+  font-size: 11px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.timeline-tick {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.timeline {
+  height: 18px;
+  background: #2a2f38;
+  border-radius: 4px;
+}
