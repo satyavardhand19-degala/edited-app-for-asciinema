@@ -6,34 +6,30 @@ body {
 }
 
 #player {
-  margin-bottom: 60px;
-  position: relative;
-  z-index: 1;
+  margin-top: 15px;
 }
 
 /* TIMELINE */
 
 .timeline-panel {
-  position: relative;
-  width: 100;
-  z-index: 10;
   margin-top: 20px;
+  width: 100%;
 }
 
 .timeline-ruler {
   position: relative;
+  width: 100%;
   height: 26px;
   background: #1b1f26;
-  border-bottom: 1px solid #333;
-  overflow: visible;
+  font-size: 11px;
+  color: #ddd;
+  overflow: hidden;
 }
 
 .timeline-tick {
   position: absolute;
   top: 4px;
   transform: translateX(-50%);
-  color: #e0e0e0;
-  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -43,7 +39,35 @@ body {
   height: 18px;
   background: #2a2f38;
   border-radius: 4px;
+  margin-top: 4px;
 }
+
+/* TRIM HANDLES */
+
+.handle {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  background: #00bcd4;
+  cursor: ew-resize;
+  z-index: 10;
+}
+
+.handle.start { left: 0; }
+.handle.end   { right: 0; }
+
+/* CUT REGION */
+
+.cut-region {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.35);
+  z-index: 5;
+}
+
+/* PLAYHEAD */
 
 #playhead {
   position: absolute;
@@ -52,4 +76,11 @@ body {
   height: 42px;
   background: red;
   cursor: ew-resize;
+  z-index: 20;
+}
+
+button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
 }
