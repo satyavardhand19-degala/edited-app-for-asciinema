@@ -8,9 +8,10 @@ const playhead = document.getElementById("playhead");
 
 let castData = null;
 let duration = 0;
-let dragging = false;
+let playerInstance = null;
+let isScrubbing = false;
 
-/* ---------- LOAD CAST ---------- */
+/* LOAD CAST */
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
@@ -30,13 +31,17 @@ fileInput.addEventListener("change", () => {
     duration = stdout.at(-1)[0];
 
     loadPlayer();
-    requestAnimationFrame(drawTimeline);
-  };
-
+    
+    requestAnimationFrame(() => {
+      setTimeout(drawTimeline, 50);
+    });
+    
+    timelineObserver.observe(timeline);
+   }
   reader.readAsText(file);
 });
 
-/* ---------- PLAYER ---------- */
+/* PLAYER */
 
 function loadPlayer() {
   playerBox.innerHTML = "";
@@ -48,20 +53,27 @@ function loadPlayer() {
     idle_time_limit: null
   }) + "\n";
 
-  castData.stdout.forEach(e => {
-    text += JSON.stringify(e) + "\n";
-  });
+  castData.stdout.forEach(e => text += JSON.stringify(e) + "\n");
 
   const blob = new Blob([text], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
-  AsciinemaPlayer.create(url, playerBox, {
+  playerInstance = AsciinemaPlayer.create(url, playerBox, {
     autoplay: false,
     controls: true
   });
+
+  playerInstance.addEventListener("time", e => {
+    if (!isScrubbing) updatePlayhead(e.detail.time);
+  });
 }
 
-/* ---------- TIMELINE ---------- */
+function updatePlayhead(time) {
+  playhead.style.left =
+    `${(time / duration) * timeline.clientWidth}px`;
+}
+
+/* TIMELINE */
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60);
@@ -71,37 +83,49 @@ function formatTime(sec) {
 
 function drawTimeline() {
   ruler.innerHTML = "";
-  const width = timeline.clientWidth;
+
+  const width = timeline.offsetWidth;
   if (!width || !duration) return;
 
   const pxPerSec = width / duration;
   let step = Math.max(1, Math.round(80 / pxPerSec));
 
   for (let t = 0; t <= duration; t += step) {
-    const x = (t / duration) * width;
     const tick = document.createElement("div");
     tick.className = "timeline-tick";
-    tick.style.left = `${x}px`;
+    tick.style.left = `${(t / duration) * width}px`;
     tick.textContent = formatTime(t);
     ruler.appendChild(tick);
   }
+
+  console.log("Timeline labels drawn ✔");
 }
 
-/* ---------- PLAYHEAD ---------- */
+/* PLAYHEAD SCRUB */
 
 playhead.addEventListener("mousedown", e => {
-  dragging = true;
+  isScrubbing = true;
   e.preventDefault();
 });
 
-document.addEventListener("mouseup", () => dragging = false);
+document.addEventListener("mouseup", () => isScrubbing = false);
 
 document.addEventListener("mousemove", e => {
-  if (!dragging || !duration) return;
+  if (!isScrubbing || !playerInstance) return;
 
   const rect = timeline.getBoundingClientRect();
-  let x = e.clientX - rect.left;
-  x = Math.max(0, Math.min(rect.width, x));
-
+  const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
   playhead.style.left = `${x}px`;
+  playerInstance.seek((x / rect.width) * duration);
+});
+
+timeline.addEventListener("click", e => {
+  if (!playerInstance || isScrubbing) return;
+
+  const rect = timeline.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const time = (x / rect.width) * duration;
+
+  updatePlayhead(time);
+  playerInstance.seek(time);
 });

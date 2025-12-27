@@ -6,42 +6,44 @@ body {
 }
 
 #player {
-  margin-top: 20px;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 1;
 }
 
 /* TIMELINE */
 
 .timeline-panel {
-  width: 100%;
+  position: relative;
+  width: 100;
+  z-index: 10;
   margin-top: 20px;
 }
 
 .timeline-ruler {
   position: relative;
-  width: 100%;
-  height: 22px;
+  height: 26px;
   background: #1b1f26;
-  color: #ccc;
-  font-size: 11px;
-  overflow: hidden;
+  border-bottom: 1px solid #333;
+  overflow: visible;
 }
 
 .timeline-tick {
   position: absolute;
-  top: 3px;
+  top: 4px;
   transform: translateX(-50%);
+  color: #e0e0e0;
+  font-size: 11px;
   white-space: nowrap;
 }
 
 .timeline {
-  position: relative; /* 🔥 REQUIRED */
+  position: relative;
   width: 100%;
   height: 18px;
   background: #2a2f38;
   border-radius: 4px;
 }
-
-/* PLAYHEAD */
 
 #playhead {
   position: absolute;
