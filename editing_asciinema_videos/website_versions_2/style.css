@@ -23,7 +23,6 @@ body {
   background: #1b1f26;
   font-size: 11px;
   color: #ddd;
-  overflow: hidden;
 }
 
 .timeline-tick {
@@ -57,14 +56,15 @@ body {
 .handle.start { left: 0; }
 .handle.end   { right: 0; }
 
-/* CUT REGION */
+/* CUT BLOCKS */
 
-.cut-region {
+.cut-block {
   position: absolute;
   top: 0;
   height: 100%;
-  background: rgba(255, 0, 0, 0.35);
+  background: rgba(255, 0, 0, 0.45);
   z-index: 5;
+  pointer-events: none;
 }
 
 /* PLAYHEAD */
@@ -79,8 +79,14 @@ body {
   z-index: 20;
 }
 
-button {
+/* BUTTONS */
+
+.controls {
   margin-top: 10px;
+}
+
+button {
   padding: 6px 12px;
+  margin-right: 6px;
   cursor: pointer;
 }

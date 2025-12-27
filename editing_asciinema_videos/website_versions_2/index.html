@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <title>Asciinema CAST Editor</title>
 
-  <!-- Asciinema Player -->
   <link rel="stylesheet"
         href="https://unpkg.com/asciinema-player@3.7.1/dist/bundle/asciinema-player.css">
-
-  <!-- App CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -25,13 +22,15 @@
 
   <div class="timeline" id="timeline">
     <div class="handle start"></div>
-    <div class="cut-region"></div>
     <div class="handle end"></div>
     <div id="playhead"></div>
   </div>
 </div>
 
-<button id="applyCutBtn">Apply Cut</button>
+<div class="controls">
+  <button id="addCutBtn">Add Cut</button>
+  <button id="applyCutBtn">Apply All Cuts</button>
+</div>
 
 <script src="https://unpkg.com/asciinema-player@3.7.1/dist/bundle/asciinema-player.min.js"></script>
 <script src="editor.js"></script>

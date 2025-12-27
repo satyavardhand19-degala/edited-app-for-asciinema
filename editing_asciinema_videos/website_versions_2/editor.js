@@ -8,14 +8,17 @@ const playhead = document.getElementById("playhead");
 
 const startHandle = document.querySelector(".handle.start");
 const endHandle   = document.querySelector(".handle.end");
-const cutRegion   = document.querySelector(".cut-region");
+const addCutBtn   = document.getElementById("addCutBtn");
 const applyCutBtn = document.getElementById("applyCutBtn");
 
 let castData = null;
 let duration = 0;
 let player = null;
-let dragging = null;
+
+let draggingHandle = null;
 let scrubbing = false;
+
+let cuts = []; // {start, end}
 
 /* ================= LOAD CAST ================= */
 
@@ -35,7 +38,8 @@ fileInput.addEventListener("change", () => {
     loadPlayer();
     setTimeout(() => {
       drawTimeline();
-      resetTrimHandles();
+      resetHandles();
+      drawCuts();
     }, 100);
   };
   reader.readAsText(file);
@@ -99,67 +103,110 @@ function drawTimeline() {
   }
 }
 
-/* ================= TRIM ================= */
+/* ================= HANDLES ================= */
 
-function resetTrimHandles() {
+function resetHandles() {
   const w = timeline.clientWidth;
   startHandle.style.left = "0px";
   endHandle.style.left = (w - 8) + "px";
-  updateCutRegion();
-}
-
-function updateCutRegion() {
-  const s = startHandle.offsetLeft;
-  const e = endHandle.offsetLeft;
-  cutRegion.style.left = s + "px";
-  cutRegion.style.width = (e - s) + "px";
 }
 
 [startHandle, endHandle].forEach(h => {
   h.addEventListener("mousedown", e => {
-    dragging = h;
+    draggingHandle = h;
     e.stopPropagation();
   });
 });
 
-document.addEventListener("mouseup", () => dragging = null);
+document.addEventListener("mouseup", () => draggingHandle = null);
 
 document.addEventListener("mousemove", e => {
-  if (!dragging) return;
+  if (!draggingHandle) return;
 
   const rect = timeline.getBoundingClientRect();
   let x = e.clientX - rect.left;
   x = Math.max(0, Math.min(rect.width, x));
-  dragging.style.left = x + "px";
+
+  draggingHandle.style.left = x + "px";
 
   if (startHandle.offsetLeft > endHandle.offsetLeft) {
-    if (dragging === startHandle)
+    if (draggingHandle === startHandle)
       endHandle.style.left = startHandle.style.left;
     else
       startHandle.style.left = endHandle.style.left;
   }
-
-  updateCutRegion();
 });
 
-/* ================= APPLY CUT ================= */
+/* ================= CUTS ================= */
+
+addCutBtn.onclick = () => {
+  const w = timeline.clientWidth;
+  const start = (startHandle.offsetLeft / w) * duration;
+  const end   = (endHandle.offsetLeft / w) * duration;
+
+  if (end - start < 0.2) return;
+
+  cuts.push({ start, end });
+  drawCuts();
+};
+
+function drawCuts() {
+  document.querySelectorAll(".cut-block").forEach(e => e.remove());
+
+  const w = timeline.clientWidth;
+  cuts.forEach(cut => {
+    const div = document.createElement("div");
+    div.className = "cut-block";
+    div.style.left = (cut.start / duration) * w + "px";
+    div.style.width =
+      ((cut.end - cut.start) / duration) * w + "px";
+    timeline.appendChild(div);
+  });
+}
 
 applyCutBtn.onclick = () => {
-  const w = timeline.clientWidth;
-  const startTime = (startHandle.offsetLeft / w) * duration;
-  const endTime   = (endHandle.offsetLeft / w) * duration;
+  if (cuts.length === 0) return;
 
-  castData.stdout = castData.stdout
-    .filter(e => e[0] < startTime || e[0] > endTime)
-    .map(e => e[0] > endTime
-      ? [e[0] - (endTime - startTime), e[1], e[2]]
-      : e);
+  cuts.sort((a, b) => a.start - b.start);
 
-  duration = castData.stdout.at(-1)[0];
+  let newStdout = [];
+  let removedTime = 0;
+  let cutIndex = 0;
+
+  for (const e of castData.stdout) {
+    let t = e[0];
+
+    while (
+      cutIndex < cuts.length &&
+      t > cuts[cutIndex].end
+    ) {
+      removedTime += cuts[cutIndex].end - cuts[cutIndex].start;
+      cutIndex++;
+    }
+
+    if (
+      cutIndex < cuts.length &&
+      t >= cuts[cutIndex].start &&
+      t <= cuts[cutIndex].end
+    ) {
+      continue;
+    }
+
+    newStdout.push([
+      t - removedTime,
+      e[1],
+      e[2]
+    ]);
+  }
+
+  castData.stdout = newStdout;
+  duration = newStdout.at(-1)[0];
+  cuts = [];
 
   loadPlayer();
   drawTimeline();
-  resetTrimHandles();
+  resetHandles();
+  drawCuts();
 };
 
 /* ================= PLAYHEAD ================= */
